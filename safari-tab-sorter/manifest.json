@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Sortierer",
+  "version": "1.0.0",
+  "description": "Sortiert Tabs anhand eigener Kategorien. Unsichere Tabs bleiben in der Hauptgruppe.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "tabGroups"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Tab Sortierer",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png",
+    "512": "icons/icon-512.png"
+  }
+}

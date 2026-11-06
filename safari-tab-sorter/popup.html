@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="popup">
+  <h1>Tab Sortierer</h1>
+  <p id="mode" class="muted"></p>
+
+  <div class="row">
+    <button id="sort" class="primary">Jetzt sortieren</button>
+    <button id="preview">Vorschau</button>
+  </div>
+
+  <label class="check"><input type="checkbox" id="auto"> Neue Tabs automatisch einsortieren</label>
+  <label class="check"><input type="checkbox" id="excludeWindow"> Dieses Fenster nie sortieren</label>
+
+  <div id="result"></div>
+
+  <p><a href="#" id="options">Kategorien &amp; Ausschlüsse bearbeiten …</a></p>
+  <script src="popup.js"></script>
+</body>
+</html>

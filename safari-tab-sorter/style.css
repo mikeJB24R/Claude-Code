@@ -1,0 +1,62 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1d1d1f;
+  --muted: #6e6e73;
+  --line: #d2d2d7;
+  --field: #f5f5f7;
+  --accent: #0a66d8;
+  --accent-fg: #ffffff;
+  --error: #c62828;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1e;
+    --fg: #f2f2f7;
+    --muted: #a1a1a6;
+    --line: #3a3a3c;
+    --field: #2c2c2e;
+    --accent: #3b8cff;
+    --error: #ff6b6b;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+h1 { font-size: 17px; margin: 0 0 4px; }
+h2 { font-size: 15px; margin: 0 0 6px; }
+.muted { color: var(--muted); font-size: 12.5px; }
+.error { color: var(--error); }
+code { background: var(--field); padding: 0 4px; border-radius: 4px; }
+.row { display: flex; gap: 8px; align-items: center; margin: 10px 0; flex-wrap: wrap; }
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 6px 10px;
+}
+button { cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+button:disabled { opacity: .6; }
+label { display: block; margin: 8px 0; }
+label.check { display: flex; gap: 6px; align-items: center; }
+a { color: var(--accent); }
+
+.popup { width: 340px; padding: 14px; }
+.popup ul { margin: 4px 0 8px; padding-left: 18px; max-height: 160px; overflow: auto; }
+.popup li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12.5px; }
+details summary { cursor: pointer; font-weight: 600; margin-top: 6px; }
+
+.options { max-width: 720px; margin: 0 auto; padding: 24px 16px 80px; }
+.options section { border-top: 1px solid var(--line); padding: 16px 0; }
+.options input[type="text"], .options textarea { width: 100%; }
+.options .row input { flex: 1; min-width: 180px; }
+.cat { display: grid; grid-template-columns: 180px 1fr auto; gap: 8px; margin-bottom: 8px; align-items: start; }
+@media (max-width: 520px) { .cat { grid-template-columns: 1fr auto; } .cat .keywords { grid-column: 1 / -1; grid-row: 2; } }
+.sticky { position: sticky; bottom: 0; background: var(--bg); padding: 10px 0; border-top: 1px solid var(--line); }

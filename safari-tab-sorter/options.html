@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Tab Sortierer – Einstellungen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="options">
+  <h1>Tab Sortierer</h1>
+
+  <section>
+    <h2>Kategorien</h2>
+    <p class="muted">Pro Kategorie Stichwörter mit Komma trennen. Ein Stichwort mit Punkt (z. B. <code>github.com</code>)
+      gilt als Domain und zählt stark (3 Punkte). Ein normales Wort zählt 2 Punkte im Domainnamen
+      und je 1 Punkt im Titel oder in der Adresse.</p>
+    <div id="categories"></div>
+    <button id="addCat">+ Kategorie</button>
+  </section>
+
+  <section>
+    <h2>Sicherheit</h2>
+    <label>Ein Tab wird nur verschoben, wenn er mindestens
+      <select id="strictness">
+        <option value="1">1 Punkt (locker)</option>
+        <option value="2">2 Punkte (normal)</option>
+        <option value="3">3 Punkte (streng)</option>
+        <option value="4">4 Punkte (sehr streng)</option>
+      </select>
+      erreicht und keine andere Kategorie gleichauf liegt.</label>
+    <label>Name der Hauptgruppe für unsichere Tabs
+      <input id="mainName" type="text" placeholder="Allgemein"></label>
+  </section>
+
+  <section>
+    <h2>Ausgeschlossene Gruppen</h2>
+    <p class="muted">Ein Name pro Zeile. Tabs in Gruppen oder Kategorie-Fenstern mit diesen Namen werden nie angefasst,
+      und Tabs, die in diese Kategorie fallen würden, bleiben, wo sie sind.
+      Ein einzelnes Fenster schließt du im Popup aus („Dieses Fenster nie sortieren“).</p>
+    <textarea id="excluded" rows="4" placeholder="z. B.&#10;Projekt X&#10;Privat"></textarea>
+  </section>
+
+  <section>
+    <h2>Testen</h2>
+    <div class="row">
+      <input id="testUrl" type="text" placeholder="https://… (Adresse)">
+      <input id="testTitle" type="text" placeholder="Titel (optional)">
+    </div>
+    <p id="testResult" class="muted">Gib eine Adresse ein, um zu sehen, wohin der Tab käme.</p>
+  </section>
+
+  <div class="row sticky">
+    <button id="save" class="primary">Speichern</button>
+    <span id="saved" class="muted"></span>
+  </div>
+
+  <template id="catTpl">
+    <div class="cat">
+      <input class="name" type="text" placeholder="Name der Kategorie">
+      <textarea class="keywords" rows="2" placeholder="github.com, jira, rechnung"></textarea>
+      <button class="remove" title="Entfernen">✕</button>
+    </div>
+  </template>
+
+  <script src="classify.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
