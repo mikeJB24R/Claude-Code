@@ -1,0 +1,24 @@
+{
+  "name": "Arbeitszimmer",
+  "room": {
+    "length": 400,
+    "width": 320,
+    "height": 260,
+    "wallThickness": 15,
+    "floor": { "color": "#cfc8bc", "texture": "tiles" },
+    "wallColor": "#eef1f3",
+    "ceilingColor": "#ffffff"
+  },
+  "openings": [
+    { "type": "window", "wall": "east", "position": 100, "width": 120, "height": 130, "sill": 85 },
+    { "type": "window", "wall": "south", "position": 60, "width": 100, "height": 130, "sill": 85 },
+    { "type": "door", "wall": "west", "position": 30, "width": 85, "height": 205 }
+  ],
+  "furniture": [
+    { "id": "schreibtisch", "name": "Schreibtisch", "width": 160, "depth": 80, "height": 75, "color": "#c8b08a", "position": { "x": 200, "z": 40 }, "rotation": 0 },
+    { "id": "regal", "name": "Regal", "width": 100, "depth": 35, "height": 200, "color": "#f2f2f2", "position": { "x": 17.5, "z": 80 }, "rotation": 90 },
+    { "id": "sessel", "name": "Sessel", "width": 85, "depth": 85, "height": 80, "color": "#b5651d", "position": { "x": 300, "z": 220 }, "rotation": 315, "model": "models/sessel.glb" },
+    { "id": "wandregal", "name": "Wandregal", "width": 80, "depth": 25, "height": 30, "color": "#7a5c3e", "position": { "x": 120, "z": 307.5 }, "rotation": 180, "elevation": 150 }
+  ],
+  "light": { "sunAzimuth": 135, "sunElevation": 30 }
+}

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D-Raumplaner</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="viewport">
+      <canvas id="scene"></canvas>
+      <div id="crosshair" hidden></div>
+      <div id="walk-hint" hidden>Klicken, um sich umzusehen · WASD laufen · Shift schneller · Esc Maus freigeben · C zurück</div>
+    </div>
+
+    <aside id="panel">
+      <h1>3D-Raumplaner</h1>
+
+      <section>
+        <label class="field">Raum
+          <select id="room-select"></select>
+        </label>
+        <div class="row">
+          <button id="btn-save" title="Aktuelles Layout als JSON herunterladen">Layout speichern</button>
+          <label class="button" title="Gespeichertes Layout laden">Layout laden
+            <input id="file-input" type="file" accept=".json,application/json" hidden />
+          </label>
+        </div>
+        <button id="btn-reset" class="secondary">Auf Ausgangsstand zurücksetzen</button>
+      </section>
+
+      <section>
+        <h2>Ansicht</h2>
+        <div class="segmented">
+          <button id="btn-orbit" class="active">Orbit</button>
+          <button id="btn-walk">Begehen</button>
+        </div>
+        <div class="row">
+          <button id="btn-overview" class="secondary">Übersicht</button>
+          <button id="btn-top" class="secondary">Draufsicht</button>
+        </div>
+        <label class="check"><input type="checkbox" id="chk-snap" checked /> Raster-Snap 5 cm</label>
+        <label class="check"><input type="checkbox" id="chk-ceiling" /> Decke anzeigen</label>
+        <label class="check"><input type="checkbox" id="chk-walls" checked /> Vordere Wände ausblenden</label>
+        <label class="check"><input type="checkbox" id="chk-labels" checked /> Beschriftungen</label>
+        <label class="field">Tageszeit <span id="time-value"></span>
+          <input type="range" id="time" min="6" max="20" step="0.25" value="12" />
+        </label>
+      </section>
+
+      <section>
+        <h2>Warnungen</h2>
+        <ul id="warnings"><li class="ok">Keine Kollisionen</li></ul>
+      </section>
+
+      <section class="help">
+        <h2>Bedienung</h2>
+        <p><b>Orbit:</b> linke Maustaste ziehen = drehen, rechte = verschieben, Mausrad = zoomen.</p>
+        <p><b>Möbel:</b> anklicken und ziehen, <kbd>R</kbd> dreht um 90° (<kbd>Shift</kbd>+<kbd>R</kbd> zurück), <kbd>Esc</kbd> hebt die Auswahl auf.</p>
+        <p><b>Begehen:</b> <kbd>C</kbd> oder Schalter, dann <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> + Maus. Klick wählt das Möbel im Fadenkreuz.</p>
+      </section>
+    </aside>
+
+    <aside id="info" hidden>
+      <div class="info-head">
+        <h2 id="info-name"></h2>
+        <button id="info-close" class="icon" title="Auswahl aufheben">×</button>
+      </div>
+      <dl id="info-dims"></dl>
+      <div class="info-edit">
+        <label>X (Mitte) <input type="number" id="in-x" step="1" /></label>
+        <label>Z (Mitte) <input type="number" id="in-z" step="1" /></label>
+        <label>Drehung ° <input type="number" id="in-rot" step="90" /></label>
+      </div>
+      <h3>Abstand zu den Wänden</h3>
+      <dl id="info-dist"></dl>
+      <p id="info-status"></p>
+    </aside>
+
+    <div id="toast" hidden></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

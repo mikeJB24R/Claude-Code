@@ -1,0 +1,43 @@
+{
+  "name": "Wohnzimmer",
+  "room": {
+    "length": 480,
+    "width": 360,
+    "height": 250,
+    "wallThickness": 12,
+    "floor": { "color": "#d9bc8c", "texture": "wood" },
+    "wallColor": "#f4f3ef",
+    "ceilingColor": "#ffffff"
+  },
+  "openings": [
+    { "type": "window", "wall": "south", "position": "center", "width": 180, "height": 140, "sill": 90 },
+    { "type": "door", "wall": "north", "position": 40, "width": 90, "height": 210, "sill": 0 }
+  ],
+  "furniture": [
+    {
+      "id": "sofa",
+      "name": "Sofa",
+      "width": 220, "depth": 95, "height": 85,
+      "color": "#5c6b7a",
+      "position": { "x": 432.5, "z": 180 },
+      "rotation": 270
+    },
+    {
+      "id": "couchtisch",
+      "name": "Couchtisch",
+      "width": 110, "depth": 60, "height": 45,
+      "color": "#8a6a4a",
+      "position": { "x": 315, "z": 180 },
+      "rotation": 90
+    },
+    {
+      "id": "sideboard",
+      "name": "Sideboard",
+      "width": 180, "depth": 40, "height": 75,
+      "color": "#e8e4dc",
+      "position": { "x": 20, "z": 180 },
+      "rotation": 90
+    }
+  ],
+  "light": { "sunAzimuth": 180, "sunElevation": 35 }
+}
