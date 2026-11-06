@@ -18,23 +18,40 @@ Darum bekommt in Safari **jede Kategorie ein eigenes Fenster**:
 In Chrome, Edge oder Firefox entstehen mit derselben Erweiterung echte Tabgruppen.
 Sollte Apple später eine Tabgruppen-API einführen, nutzt die Erweiterung sie automatisch.
 
-## Installation (Mac mit Xcode)
+## Installation ohne Terminal
 
-1. Installiere **Xcode** aus dem App Store und starte es einmal.
-2. Entpacke den Ordner `safari-tab-sorter` und öffne darüber das Terminal:
-   ```bash
-   xcrun safari-web-extension-converter safari-tab-sorter --app-name "Tab Sortierer" --macos-only
-   ```
-   Xcode öffnet sich mit dem erzeugten Projekt.
-3. Klicke in Xcode auf **▶ (Run)**. Eine kleine App startet. Du kannst sie danach schließen.
-4. In Safari: **Einstellungen → Erweitert → „Funktionen für Webentwickler anzeigen“** aktivieren.
-   Dann **Entwickler → „Nicht signierte Erweiterungen erlauben“** wählen.
-   Diese Einstellung musst du nach jedem Neustart von Safari erneut setzen.
-5. **Einstellungen → Erweiterungen → „Tab Sortierer“** einschalten.
-   Bei „Andere Websites“ wählst du „Erlauben“. Sonst kann die Erweiterung Titel und Adressen der Tabs nicht lesen.
+Entpacke zuerst die ZIP-Datei per Doppelklick im Finder. Du erhältst den Ordner `safari-tab-sorter`.
 
-Den Schritt mit „Nicht signierte Erweiterungen erlauben“ sparst du dir nur so:
-Du signierst die App in Xcode mit einem Apple-Developer-Konto (Signing & Capabilities → Team).
+### Weg A – ohne Xcode, in 1 Minute (Safari 26 oder neuer)
+
+1. Öffne **Safari → Einstellungen → Erweitert** und setze den Haken bei **„Funktionen für Webentwickler anzeigen“**.
+2. In den Einstellungen erscheint jetzt der Reiter **„Entwickler“**. Öffne ihn und klicke auf **„Temporäre Erweiterung hinzufügen …“**.
+3. Wähle den Ordner `safari-tab-sorter` aus.
+4. Erlaube der Erweiterung den Zugriff auf Websites.
+   Sonst kann sie die Titel und Adressen der Tabs nicht lesen.
+
+Nachteil: Die Erweiterung ist **temporär**. Nach jedem Beenden von Safari musst du die Schritte 2 und 3 wiederholen.
+Deine Kategorien gehen dabei unter Umständen verloren.
+
+### Weg B – dauerhaft, mit Xcode (nur Mausklicks)
+
+1. Installiere **Xcode** aus dem App Store und starte es.
+2. Wähle **File → New → Project …**, dann oben **macOS** und dort **„Safari Extension App“**. Klicke auf **Next**.
+   - Product Name: `Tab Sortierer`
+   - Team: deine Apple-ID. Hast du noch keine hinterlegt, gehst du auf „Add Account …“. Eine kostenlose Apple-ID genügt.
+   - Language: Swift. Type: **Safari Web Extension**.
+   - Speichere das Projekt, z. B. in „Dokumente“.
+3. Klappe links im Projekt-Navigator **„Tab Sortierer Extension“ → „Resources“** auf.
+   Markiere alles darin und lösche es (Rechtsklick → Delete → „Move to Trash“).
+4. Ziehe **den Inhalt** des Ordners `safari-tab-sorter` aus dem Finder auf „Resources“.
+   Das sind `manifest.json`, die `.js`-, `.html`- und `.css`-Dateien und der Ordner `icons`.
+   Im folgenden Fenster setzt du den Haken bei **„Copy items if needed“** und beim Ziel **„Tab Sortierer Extension“**.
+5. Klicke oben links auf **▶ (Run)**. Eine kleine App öffnet sich. Du kannst sie schließen.
+6. Öffne **Safari → Einstellungen → Erweiterungen**, schalte **„Tab Sortierer“** ein und erlaube den Zugriff auf Websites.
+
+Erscheint die Erweiterung in Schritt 6 nicht, liegt das an der Signierung.
+Aktiviere dann im Reiter „Entwickler“ der Safari-Einstellungen **„Nicht signierte Erweiterungen erlauben“**.
+Danach siehst du sie in der Liste.
 
 ## Bedienung
 
