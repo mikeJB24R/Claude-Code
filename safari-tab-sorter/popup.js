@@ -23,7 +23,8 @@ function render(p, done) {
   const byCat = {};
   for (const m of p.moves) (byCat[m.category] ||= []).push(m);
 
-  let html = (p.opened ? `<p><strong>${p.opened}</strong> Links geöffnet.</p>` : "") + `<p><strong>${p.moves.length}</strong> ${done ? "verschoben" : "würden verschoben"}, `
+  let html = (p.aiError ? `<p class="error">KI nicht verfügbar (${esc(p.aiError)}) – Stichwortregeln verwendet.</p>` : "")
+    + (p.opened ? `<p><strong>${p.opened}</strong> Links geöffnet.</p>` : "") + `<p><strong>${p.moves.length}</strong> ${done ? "verschoben" : "würden verschoben"}, `
     + `<strong>${p.stay.length}</strong> bleiben in „${esc(mainName)}“`
     + (p.skipped.length ? `, <strong>${p.skipped.length}</strong> ausgeschlossen` : "") + ".</p>";
 
@@ -52,15 +53,23 @@ async function init() {
 
   const status = await send({ type: "status" });
   $("excludeWindow").checked = !!status.windowExcluded;
-  $("mode").textContent = status.mode === "groups"
-    ? "Modus: echte Tabgruppen in diesem Fenster."
-    : "Modus: ein Fenster pro Kategorie (Safari erlaubt Erweiterungen keinen Zugriff auf Tabgruppen)."
-      + (status.windowCategory ? ` Dieses Fenster gehört zu „${status.windowCategory}“.` : "");
+  $("mode").textContent = (status.ai
+    ? "Zuordnung: Claude-KI. "
+    : "Zuordnung: Stichwortregeln (für KI in den Einstellungen API-Key eintragen). ")
+    + (status.mode === "groups"
+      ? "Echte Tabgruppen in diesem Fenster."
+      : "Ein Fenster pro Kategorie (Safari erlaubt Erweiterungen keinen Zugriff auf Tabgruppen)."
+        + (status.windowCategory ? ` Dieses Fenster gehört zu „${status.windowCategory}“.` : ""));
 }
 
-$("preview").addEventListener("click", async () => render(await send({ type: "preview" }), false));
+const thinking = () => ($("result").innerHTML = `<p class="muted">Ordne Tabs zu …</p>`);
+$("preview").addEventListener("click", async () => {
+  thinking();
+  render(await send({ type: "preview" }), false);
+});
 $("sort").addEventListener("click", async () => {
   $("sort").disabled = true;
+  thinking();
   render(await send({ type: "sort" }), true);
   $("sort").disabled = false;
 });

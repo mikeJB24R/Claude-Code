@@ -10,7 +10,10 @@ const DEFAULT_SETTINGS = {
   ],
   excluded: [],
   strictness: 2,
-  auto: false
+  auto: false,
+  apiKey: "",
+  aiEnabled: true,
+  readContent: true
 };
 
 function normalizeKeyword(k) {

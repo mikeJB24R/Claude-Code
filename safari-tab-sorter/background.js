@@ -1,4 +1,4 @@
-importScripts("classify.js");
+importScripts("classify.js", "ai.js");
 
 const api = globalThis.browser ?? globalThis.chrome;
 const GROUP_COLORS = ["blue", "green", "orange", "purple", "red", "cyan", "pink", "yellow", "grey"];
@@ -54,6 +54,73 @@ async function groupTitles(windowId) {
   return map;
 }
 
+// ---------- KI-Zuordnung ----------
+const useAI = (settings) => settings.aiEnabled !== false && !!settings.apiKey;
+
+// Merkt sich KI-Ergebnisse 15 Minuten, damit „Vorschau“ und danach
+// „Jetzt sortieren“ nicht zweimal bezahlt werden.
+const aiCache = new Map();
+const AI_CACHE_MS = 15 * 60 * 1000;
+const cacheKey = (tab, settings) =>
+  JSON.stringify([tab.url, tab.title, settings.categories, settings.strictness]);
+
+// Liest Beschreibung und Textanfang der Seite (nur http/https).
+async function pageSnippet(tab) {
+  if (!api.scripting || !/^https?:/.test(tab.url || "") || tab.discarded) return "";
+  const read = api.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: () => {
+      const meta = document.querySelector('meta[name="description"], meta[property="og:description"]');
+      const desc = meta ? meta.getAttribute("content") || "" : "";
+      const body = (document.body ? document.body.innerText : "").replace(/\s+/g, " ").trim();
+      return (desc + " | " + body).slice(0, 600);
+    }
+  }).then((r) => (r && r[0] && r[0].result) || "").catch(() => "");
+  const timeout = new Promise((res) => setTimeout(() => res(""), 1500));
+  return Promise.race([read, timeout]);
+}
+
+async function decide(tabs, settings, result) {
+  const decisions = new Map();
+  if (!useAI(settings)) {
+    result.engine = "regeln";
+    for (const t of tabs) decisions.set(t.id, classifyTab(t, settings));
+    return decisions;
+  }
+
+  result.engine = "ki";
+  const now = Date.now();
+  const open = [];
+  for (const t of tabs) {
+    const hit = aiCache.get(cacheKey(t, settings));
+    if (hit && now - hit.at < AI_CACHE_MS) decisions.set(t.id, hit.category);
+    else if (/^https?:/.test(t.url || "")) open.push(t);
+    else decisions.set(t.id, null); // about:, chrome:// usw. bleiben stehen
+  }
+  if (!open.length) return decisions;
+
+  try {
+    const items = await Promise.all(open.map(async (t) => ({
+      id: t.id,
+      title: t.title,
+      url: t.url,
+      snippet: settings.readContent !== false ? await pageSnippet(t) : ""
+    })));
+    const ai = await classifyWithAI(items, settings);
+    for (const t of open) {
+      const category = ai.get(t.id)?.category || null;
+      decisions.set(t.id, category);
+      aiCache.set(cacheKey(t, settings), { category, at: now });
+    }
+  } catch (e) {
+    // KI nicht erreichbar → auf Stichwortregeln zurückfallen
+    result.engine = "regeln";
+    result.aiError = String(e && e.message ? e.message : e);
+    for (const t of open) decisions.set(t.id, classifyTab(t, settings));
+  }
+  return decisions;
+}
+
 // Plant, was mit jedem Tab passieren soll – ohne etwas zu verändern.
 async function plan(windowId, settings, state, onlyTabIds) {
   const result = { mode: hasTabGroups() ? "groups" : "windows", moves: [], stay: [], skipped: [], windowExcluded: false };
@@ -72,6 +139,8 @@ async function plan(windowId, settings, state, onlyTabIds) {
   let tabs = await api.tabs.query({ windowId });
   if (onlyTabIds) tabs = tabs.filter((t) => onlyTabIds.includes(t.id));
 
+  // 1. Tabs aussortieren, die nie angefasst werden
+  const candidates = [];
   for (const tab of tabs) {
     const info = { id: tab.id, title: tab.title || tab.url, url: tab.url };
     if (tab.pinned) {
@@ -83,7 +152,15 @@ async function plan(windowId, settings, state, onlyTabIds) {
       result.skipped.push({ ...info, reason: `Gruppe „${currentGroup}“ ausgeschlossen` });
       continue;
     }
-    const cat = classifyTab(tab, settings);
+    candidates.push({ tab, info, currentGroup });
+  }
+
+  // 2. Zuordnen – per KI, wenn eingerichtet, sonst per Stichwortregeln
+  const decisions = await decide(candidates.map((c) => c.tab), settings, result);
+
+  // 3. Ergebnis aufbereiten
+  for (const { tab, info, currentGroup } of candidates) {
+    const cat = decisions.get(tab.id) || null;
     if (!cat) {
       result.stay.push(info);
       continue;
@@ -221,6 +298,11 @@ api.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         return sortWindow(msg.windowId);
       case "importLinks":
         return importLinks(msg.windowId, msg.text);
+      case "testAI": {
+        const s = { ...settings, ...(msg.settings || {}) };
+        if (!s.apiKey) return { error: "Kein API-Key eingetragen." };
+        return testAI(s, { title: msg.title || "", url: msg.url });
+      }
       case "toggleWindowExclusion": {
         const i = state.excludedWindows.indexOf(msg.windowId);
         if (i >= 0) state.excludedWindows.splice(i, 1);
@@ -231,6 +313,7 @@ api.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       case "status":
         return {
           mode: hasTabGroups() ? "groups" : "windows",
+          ai: useAI(settings),
           windowExcluded: state.excludedWindows.includes(msg.windowId),
           windowCategory: categoryOfWindow(msg.windowId, state)
         };

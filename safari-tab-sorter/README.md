@@ -71,6 +71,25 @@ Die Erweiterung öffnet alle Links im Hintergrund und wartet, bis sie geladen si
 Dann sortiert sie die Tabs in deine Kategorien. Unsichere Tabs bleiben ungruppiert in der Hauptgruppe.
 Doppelte Links und Text zwischen den Links werden ignoriert.
 
+## KI-Zuordnung mit Claude
+
+Mit einem API-Key ordnet Claude die Tabs zu. Claude bekommt Titel, Adresse und einen Auszug der Seite,
+also die Beschreibung und die ersten 600 Zeichen Text.
+Damit erkennt Claude den Zweck einer Seite: Ein Zeitungsartikel über Amazon landet bei „News“, nicht bei „Shopping“.
+
+1. Erstelle unter **console.anthropic.com → API Keys** einen Key.
+   Das ist ein eigenes Konto mit eigener Abrechnung. Ein Claude-Abo reicht nicht.
+2. Trage den Key in den Einstellungen der Erweiterung unter **„KI-Zuordnung (Claude)“** ein und klicke auf **Speichern**.
+3. Schreib zu jeder Kategorie eine kurze Beschreibung, z. B. „Projekte, Kunden, Jira, github.com“.
+4. Prüfe die Zuordnung mit **„Mit KI testen“** im Bereich „Testen“.
+
+- **Kosten:** etwa 2–4 Cent pro Sortierlauf mit 50 Tabs. Klickst du innerhalb von 15 Minuten erst auf „Vorschau“ und dann auf „Jetzt sortieren“, wird nur einmal abgerechnet.
+- **Unsicher:** Liegt die Sicherheit der KI unter der eingestellten Strenge (normal: 65 %), bleibt der Tab in der Hauptgruppe.
+- **Datenschutz:** Titel, Adressen und Seitenauszüge werden an Anthropic gesendet.
+  Mit „Seiteninhalt mitlesen“ aus gehen nur Titel und Adressen raus.
+- **Ausfall:** Ist die KI nicht erreichbar oder der Key falsch, greifen die Stichwortregeln. Das Popup zeigt dann einen Hinweis.
+- **Berechtigung:** Für den Seitenauszug braucht die Erweiterung Lesezugriff auf alle Websites. Darauf weist der Browser bei der Installation hin.
+
 ## Bedienung
 
 **Klick auf das Symbol in der Symbolleiste:**
@@ -99,7 +118,8 @@ Angeheftete Tabs werden nie verschoben.
 | Datei | Aufgabe |
 |---|---|
 | `manifest.json` | Beschreibung der Erweiterung (Manifest V3) |
-| `classify.js` | Zuordnung eines Tabs zu einer Kategorie mit Punkten und Sicherheitsschwelle |
+| `classify.js` | Stichwortregeln (Ersatz, wenn keine KI verfügbar ist) |
+| `ai.js` | KI-Zuordnung über die Claude API |
 | `background.js` | Verschieben in Gruppen bzw. Fenster, Ausschlüsse, Automatik |
 | `popup.html/js` | Popup in der Symbolleiste |
 | `options.html/js` | Einstellungsseite |

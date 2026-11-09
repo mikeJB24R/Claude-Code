@@ -24,7 +24,10 @@ function readForm() {
     categories,
     strictness: Number($("strictness").value),
     mainName: $("mainName").value.trim() || "Allgemein",
-    excluded: $("excluded").value.split("\n").map((s) => s.trim()).filter(Boolean)
+    excluded: $("excluded").value.split("\n").map((s) => s.trim()).filter(Boolean),
+    apiKey: $("apiKey").value.trim(),
+    aiEnabled: $("aiEnabled").checked,
+    readContent: $("readContent").checked
   };
 }
 
@@ -36,7 +39,7 @@ function runTest() {
   const scores = s.categories.map((c) => `${c.name}: ${scoreTab(tab, c)}`).join(" · ");
   const cat = classifyTab(tab, s);
   const excluded = cat && s.excluded.some((e) => e.toLowerCase() === cat.toLowerCase());
-  $("testResult").textContent = (cat
+  $("testResult").textContent = "Regeln " + (cat
     ? excluded ? `→ „${cat}“, aber ausgeschlossen – bleibt, wo er ist.` : `→ kommt nach „${cat}“.`
     : `→ unsicher, bleibt in „${s.mainName}“.`) + (scores ? `  (Punkte: ${scores})` : "");
 }
@@ -48,7 +51,36 @@ async function load() {
   $("strictness").value = String(s.strictness);
   $("mainName").value = s.mainName;
   $("excluded").value = s.excluded.join("\n");
+  $("apiKey").value = s.apiKey || "";
+  $("aiEnabled").checked = s.aiEnabled !== false;
+  $("readContent").checked = s.readContent !== false;
 }
+
+$("testAI").addEventListener("click", async () => {
+  const url = $("testUrl").value.trim();
+  if (!url) {
+    $("testAIResult").textContent = "Bitte zuerst eine Adresse eingeben.";
+    return;
+  }
+  $("testAI").disabled = true;
+  $("testAIResult").textContent = "Frage Claude …";
+  try {
+    const r = await api.runtime.sendMessage({
+      type: "testAI",
+      settings: readForm(),
+      url: /^https?:\/\//.test(url) ? url : "https://" + url,
+      title: $("testTitle").value
+    });
+    $("testAIResult").textContent = r.error
+      ? "Fehler: " + r.error
+      : r.category
+        ? `KI → „${r.category}“ (Sicherheit ${Math.round(r.confidence * 100)} %)`
+        : `KI → unsicher (${Math.round((r.confidence || 0) * 100)} %), bleibt in „${readForm().mainName}“.`;
+  } catch (e) {
+    $("testAIResult").textContent = "Fehler: " + e.message;
+  }
+  $("testAI").disabled = false;
+});
 
 $("addCat").addEventListener("click", () => addCategoryRow());
 $("testUrl").addEventListener("input", runTest);

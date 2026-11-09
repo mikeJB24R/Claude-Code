@@ -9,24 +9,37 @@
   <h1>Tab Sortierer</h1>
 
   <section>
+    <h2>KI-Zuordnung (Claude)</h2>
+    <p class="muted">Mit API-Key ordnet Claude jeden Tab nach Titel, Adresse und Seiteninhalt zu.
+      Den Key bekommst du unter <code>console.anthropic.com</code> → API Keys. Ein Claude-Abo reicht dafür nicht.
+      Ein Sortierlauf mit 50 Tabs kostet etwa 2–4 Cent. Titel, Adressen und Auszüge der Tabs werden dabei an Anthropic gesendet.
+      Ohne Key oder bei einem Fehler greifen die Stichwortregeln.</p>
+    <label>API-Key <input id="apiKey" type="password" placeholder="sk-ant-…" autocomplete="off"></label>
+    <label class="check"><input type="checkbox" id="aiEnabled"> KI verwenden</label>
+    <label class="check"><input type="checkbox" id="readContent"> Seiteninhalt mitlesen (Beschreibung und Textanfang) – genauer</label>
+  </section>
+
+  <section>
     <h2>Kategorien</h2>
-    <p class="muted">Pro Kategorie Stichwörter mit Komma trennen. Ein Stichwort mit Punkt (z. B. <code>github.com</code>)
-      gilt als Domain und zählt stark (3 Punkte). Ein normales Wort zählt 2 Punkte im Domainnamen
-      und je 1 Punkt im Titel oder in der Adresse.</p>
+    <p class="muted">Beschreibe jede Kategorie in ein paar Worten, mit Komma getrennt, z. B.
+      <code>Projekte, Kundenkommunikation, github.com, Jira</code>. Die KI nutzt die Beschreibung als Hinweis auf das Thema.
+      Ohne KI wird daraus eine Stichwortliste: Ein Eintrag mit Punkt gilt als Domain (3 Punkte).
+      Ein Wort zählt 2 Punkte im Domainnamen und je 1 Punkt im Titel oder in der Adresse.</p>
     <div id="categories"></div>
     <button id="addCat">+ Kategorie</button>
   </section>
 
   <section>
     <h2>Sicherheit</h2>
-    <label>Ein Tab wird nur verschoben, wenn er mindestens
+    <label>Strenge
       <select id="strictness">
-        <option value="1">1 Punkt (locker)</option>
-        <option value="2">2 Punkte (normal)</option>
-        <option value="3">3 Punkte (streng)</option>
-        <option value="4">4 Punkte (sehr streng)</option>
-      </select>
-      erreicht und keine andere Kategorie gleichauf liegt.</label>
+        <option value="1">locker – KI ab 50 % Sicherheit · Regeln ab 1 Punkt</option>
+        <option value="2">normal – KI ab 65 % · Regeln ab 2 Punkten</option>
+        <option value="3">streng – KI ab 80 % · Regeln ab 3 Punkten</option>
+        <option value="4">sehr streng – KI ab 90 % · Regeln ab 4 Punkten</option>
+      </select></label>
+    <p class="muted">Ist die KI unsicherer als die eingestellte Schwelle, bleibt der Tab in der Hauptgruppe.
+      Das gilt auch, wenn bei den Regeln zwei Kategorien gleich viele Punkte haben.</p>
     <label>Name der Hauptgruppe für unsichere Tabs
       <input id="mainName" type="text" placeholder="Allgemein"></label>
   </section>
@@ -45,7 +58,10 @@
       <input id="testUrl" type="text" placeholder="https://… (Adresse)">
       <input id="testTitle" type="text" placeholder="Titel (optional)">
     </div>
-    <p id="testResult" class="muted">Gib eine Adresse ein, um zu sehen, wohin der Tab käme.</p>
+    <div class="row"><button id="testAI">Mit KI testen</button></div>
+    <p id="testResult" class="muted">Gib eine Adresse ein: Darunter siehst du sofort das Ergebnis der Stichwortregeln.
+      Mit „Mit KI testen“ fragst du Claude, das kostet unter 1 Cent.</p>
+    <p id="testAIResult" class="muted"></p>
   </section>
 
   <div class="row sticky">
@@ -56,7 +72,7 @@
   <template id="catTpl">
     <div class="cat">
       <input class="name" type="text" placeholder="Name der Kategorie">
-      <textarea class="keywords" rows="2" placeholder="github.com, jira, rechnung"></textarea>
+      <textarea class="keywords" rows="2" placeholder="Beschreibung, z. B. Projekte, Kunden, github.com, Jira"></textarea>
       <button class="remove" title="Entfernen">✕</button>
     </div>
   </template>
