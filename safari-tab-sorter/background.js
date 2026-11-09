@@ -156,6 +156,59 @@ async function sortWindow(windowId, onlyTabIds) {
   return p;
 }
 
+// ---------- Links einfügen (z. B. aus Safari kopiert) ----------
+function extractUrls(text) {
+  const found = String(text || "").match(/https?:\/\/[^\s<>"']+/gi) || [];
+  const seen = new Set();
+  return found
+    .map((u) => u.replace(/[),.;]+$/, ""))
+    .filter((u) => {
+      try {
+        new URL(u);
+      } catch {
+        return false;
+      }
+      if (seen.has(u)) return false;
+      seen.add(u);
+      return true;
+    });
+}
+
+function waitForLoaded(tabIds, timeoutMs = 15000) {
+  return new Promise((resolve) => {
+    const open = new Set(tabIds);
+    const done = () => {
+      api.tabs.onUpdated.removeListener(listener);
+      clearTimeout(timer);
+      resolve();
+    };
+    const listener = (id, change) => {
+      if (change.status === "complete" && open.delete(id) && !open.size) done();
+    };
+    const timer = setTimeout(done, timeoutMs);
+    api.tabs.onUpdated.addListener(listener);
+    // Bereits fertig geladene Tabs sofort abhaken
+    Promise.all(tabIds.map((id) => api.tabs.get(id).catch(() => null))).then((tabs) => {
+      for (const t of tabs) if (!t || t.status === "complete") open.delete(t ? t.id : null);
+      if (!open.size) done();
+    });
+  });
+}
+
+async function importLinks(windowId, text) {
+  const urls = extractUrls(text);
+  if (!urls.length) return { error: "Keine Links gefunden. Kopiere die Tabs in Safari und füge sie hier ein." };
+  const ids = [];
+  for (const url of urls) {
+    const tab = await api.tabs.create({ windowId, url, active: false });
+    ids.push(tab.id);
+  }
+  // Warten, bis die Seiten geladen sind – dann stehen auch die Titel fest.
+  await waitForLoaded(ids);
+  const result = await sortWindow(windowId, ids);
+  return { ...result, opened: urls.length };
+}
+
 // ---------- Nachrichten vom Popup ----------
 api.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
@@ -166,6 +219,8 @@ api.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         return plan(msg.windowId, settings, state);
       case "sort":
         return sortWindow(msg.windowId);
+      case "importLinks":
+        return importLinks(msg.windowId, msg.text);
       case "toggleWindowExclusion": {
         const i = state.excludedWindows.indexOf(msg.windowId);
         if (i >= 0) state.excludedWindows.splice(i, 1);

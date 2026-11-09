@@ -53,6 +53,24 @@ Erscheint die Erweiterung in Schritt 6 nicht, liegt das an der Signierung.
 Aktiviere dann im Reiter „Entwickler“ der Safari-Einstellungen **„Nicht signierte Erweiterungen erlauben“**.
 Danach siehst du sie in der Liste.
 
+### Weg C – in Chrome (dauerhaft, echte Tabgruppen)
+
+1. Gib in Chrome `chrome://extensions` in die Adressleiste ein.
+2. Schalte oben rechts den **Entwicklermodus** ein.
+3. Klicke auf **„Entpackte Erweiterung laden“** und wähle den Ordner `safari-tab-sorter`.
+4. Hefte die Erweiterung über das Puzzle-Symbol in der Symbolleiste an.
+
+### Tabs von Safari nach Chrome holen
+
+1. Markiere in Safari die Tabs (⌘-Klick) oder klicke eine Tabgruppe in der Seitenleiste mit rechts an.
+   Wähle **„Links kopieren“**.
+2. Klicke in Chrome auf das Symbol der Erweiterung und dann auf **„Links einfügen (z. B. aus Safari)“**.
+3. Füge die Links mit **⌘V** ein und klicke auf **„Öffnen & sortieren“**.
+
+Die Erweiterung öffnet alle Links im Hintergrund und wartet, bis sie geladen sind.
+Dann sortiert sie die Tabs in deine Kategorien. Unsichere Tabs bleiben ungruppiert in der Hauptgruppe.
+Doppelte Links und Text zwischen den Links werden ignoriert.
+
 ## Bedienung
 
 **Klick auf das Symbol in der Symbolleiste:**

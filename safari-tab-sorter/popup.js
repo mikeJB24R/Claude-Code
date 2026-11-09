@@ -23,7 +23,7 @@ function render(p, done) {
   const byCat = {};
   for (const m of p.moves) (byCat[m.category] ||= []).push(m);
 
-  let html = `<p><strong>${p.moves.length}</strong> ${done ? "verschoben" : "würden verschoben"}, `
+  let html = (p.opened ? `<p><strong>${p.opened}</strong> Links geöffnet.</p>` : "") + `<p><strong>${p.moves.length}</strong> ${done ? "verschoben" : "würden verschoben"}, `
     + `<strong>${p.stay.length}</strong> bleiben in „${esc(mainName)}“`
     + (p.skipped.length ? `, <strong>${p.skipped.length}</strong> ausgeschlossen` : "") + ".</p>";
 
@@ -63,6 +63,20 @@ $("sort").addEventListener("click", async () => {
   $("sort").disabled = true;
   render(await send({ type: "sort" }), true);
   $("sort").disabled = false;
+});
+$("importBox").addEventListener("toggle", () => {
+  if ($("importBox").open) $("links").focus();
+});
+$("import").addEventListener("click", async () => {
+  $("import").disabled = true;
+  $("result").innerHTML = `<p class="muted">Öffne Links und warte, bis sie geladen sind …</p>`;
+  const r = await send({ type: "importLinks", text: $("links").value });
+  if (!r.error) {
+    $("links").value = "";
+    $("importBox").open = false;
+  }
+  render(r, true);
+  $("import").disabled = false;
 });
 $("auto").addEventListener("change", async (e) => {
   const { settings } = await api.storage.local.get("settings");
